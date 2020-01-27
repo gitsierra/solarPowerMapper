@@ -11,6 +11,8 @@
 	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
 		integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
 		crossorigin=""></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
 	<style>
 		#mymap {
 			height: 80vh;
@@ -27,16 +29,43 @@
 	</p>
 	<div id="mymap"></div>
 	<script>
-		const mymap = L.map('mymap', {
-			drawControl: true
-		}).setView([39.8333333, -98.585522], 5);
-		const attribution =
-			'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-		const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-		const tiles = L.tileLayer(tileUrl, {
-			attribution
-		});
-		tiles.addTo(mymap);
+		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+			osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+			osm = L.tileLayer(osmUrl, {
+				maxZoom: 18,
+				attribution: osmAttrib
+			}),
+			map = new L.Map('mymap', {
+				center: new L.LatLng(39.8283, -98.5795),
+				zoom: 5
+			}),
+			drawnItems = L.featureGroup().addTo(map);
+		osm.addTo(map)
+
+		map.addControl(new L.Control.Draw({
+			edit: {
+				featureGroup: drawnItems,
+				poly: {
+					allowIntersection: false
+				}
+			},
+			draw: {
+				polygon: {
+					allowIntersection: false,
+					showArea: true
+				}
+			}
+		}));
+
+		map.on(L.Draw.Event.CREATED, function (event) {
+					var type = event.layerType,
+						layer = event.layer;
+					if (type === 'polygon') {
+						drawnItems.addLayer(layer);
+						var seeArea =  L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+						console.log(seeArea);
+					}
+				});
 	</script>
 </body>
 
