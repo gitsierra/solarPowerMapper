@@ -24,10 +24,14 @@
 		#mymap {
 			height: 80vh;
 		}
-		h1,p{
+
+		h1,
+		p {
 			text-align: center
 		}
-		#area,#power{
+
+		#area,
+		#power {
 			font-weight: bolder
 		}
 	</style>
@@ -44,18 +48,18 @@
 	<script>
 		var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-			osm = L.tileLayer(osmUrl, {
+			osm = L.tileLayer(osmUrl, {						//chooses the tiles for the map
 				maxZoom: 18,
 				attribution: osmAttrib
 			}),
-			map = new L.Map('mymap', {
+			map = new L.Map('mymap', {						//creates a map displayed from center of US and proper zoom level
 				center: new L.LatLng(39.8283, -98.5795),
 				zoom: 5
 			}),
 			drawnItems = L.featureGroup().addTo(map);
 		osm.addTo(map)
 
-		map.addControl(new L.Control.Draw({
+		map.addControl(new L.Control.Draw({					//allows for drawing and editing of polygons and circles
 			edit: {
 				featureGroup: drawnItems,
 				poly: {
@@ -67,12 +71,12 @@
 					allowIntersection: true,
 					showArea: true
 				},
-				polyline:false,
-				marker:false,
-				rectangle:false
+				polyline: false,
+				marker: false,
+				rectangle: false
 			}
 		}));
-		var searchControl = new L.esri.Controls.Geosearch().addTo(map);
+		var searchControl = new L.esri.Controls.Geosearch().addTo(map); //adds search bar to map
 
 		var results = new L.LayerGroup().addTo(map);
 
@@ -83,21 +87,19 @@
 			}
 		});
 
-		map.on(L.Draw.Event.CREATED, function (event) {
+		map.on(L.Draw.Event.CREATED, function (event) {   //calculates areas and power when circles or polygons are finished
 			var type = event.layerType,
 				layer = event.layer;
 			if (type === 'polygon') {
 				drawnItems.addLayer(layer);
 				var seeArea = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
 				document.getElementById('area').innerHTML = seeArea + ' m<sup>2</sup>';
-				document.getElementById('power').innerHTML = seeArea * 5.5 * 365 + ' kWh/year or ' + seeArea * 5.5 *
-					365 / 1000000 + " GWh/year";
-			}else if(type=='circle'){
+				document.getElementById('power').innerHTML = seeArea * 5.5 * 365 + ' kWh/year'
+			} else if (type == 'circle') {
 				drawnItems.addLayer(layer);
-				var seeArea = (Math.PI*(layer.getRadius())**2);
+				var seeArea = (Math.PI * (layer.getRadius()) ** 2);
 				document.getElementById('area').innerHTML = seeArea + ' m<sup>2</sup>';
-				document.getElementById('power').innerHTML = seeArea * 5.5 * 365 + ' kWh/year or ' + seeArea * 5.5 *
-					365 / 1000000 + " GWh/year";
+				document.getElementById('power').innerHTML = seeArea * 5.5 * 365 + ' kWh/year'
 			}
 		});
 	</script>
