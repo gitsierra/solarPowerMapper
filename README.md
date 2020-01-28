@@ -1,6 +1,6 @@
 # solarPowerMapper
 
-The solar installation Tool can be run locally by going to the indexl.html from any browser depending on where one may choose to store the file.
+The solar installation Tool can be run locally by going to the index.html from any browser depending on where one may choose to store the file.
 I am accessing it by typing /home/samuel/Developer/solarPowerMapper/index.html for example.
 It will work as long as there is an internet connection in order to get the proper libraries.
 
