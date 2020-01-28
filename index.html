@@ -13,9 +13,22 @@
 		crossorigin=""></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+	<script src="https://cdn-geoweb.s3.amazonaws.com/esri-leaflet/0.0.1-beta.5/esri-leaflet.js"></script>
+
+	<script src="https://cdn-geoweb.s3.amazonaws.com/esri-leaflet-geocoder/0.0.1-beta.5/esri-leaflet-geocoder.js">
+	</script>
+
+	<link rel="stylesheet" type="text/css"
+		href="https://cdn-geoweb.s3.amazonaws.com/esri-leaflet-geocoder/0.0.1-beta.5/esri-leaflet-geocoder.css">
 	<style>
 		#mymap {
 			height: 80vh;
+		}
+		h1,p{
+			text-align: center
+		}
+		#area,#power{
+			font-weight: bolder
 		}
 	</style>
 	<title>Document</title>
@@ -46,26 +59,47 @@
 			edit: {
 				featureGroup: drawnItems,
 				poly: {
-					allowIntersection: false
+					allowIntersection: true
 				}
 			},
 			draw: {
 				polygon: {
-					allowIntersection: false,
+					allowIntersection: true,
 					showArea: true
-				}
+				},
+				polyline:false,
+				marker:false,
+				rectangle:false
 			}
 		}));
+		var searchControl = new L.esri.Controls.Geosearch().addTo(map);
+
+		var results = new L.LayerGroup().addTo(map);
+
+		searchControl.on('results', function (data) {
+			results.clearLayers();
+			for (var i = data.results.length - 1; i >= 0; i--) {
+				results.addLayer(L.marker(data.results[i].latlng));
+			}
+		});
 
 		map.on(L.Draw.Event.CREATED, function (event) {
-					var type = event.layerType,
-						layer = event.layer;
-					if (type === 'polygon') {
-						drawnItems.addLayer(layer);
-						var seeArea =  L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
-						console.log(seeArea);
-					}
-				});
+			var type = event.layerType,
+				layer = event.layer;
+			if (type === 'polygon') {
+				drawnItems.addLayer(layer);
+				var seeArea = L.GeometryUtil.geodesicArea(layer.getLatLngs()[0]);
+				document.getElementById('area').innerHTML = seeArea + ' m<sup>2</sup>';
+				document.getElementById('power').innerHTML = seeArea * 5.5 * 365 + ' kWh/year or ' + seeArea * 5.5 *
+					365 / 1000000 + " GWh/year";
+			}else if(type=='circle'){
+				drawnItems.addLayer(layer);
+				var seeArea = (Math.PI*(layer.getRadius())**2);
+				document.getElementById('area').innerHTML = seeArea + ' m<sup>2</sup>';
+				document.getElementById('power').innerHTML = seeArea * 5.5 * 365 + ' kWh/year or ' + seeArea * 5.5 *
+					365 / 1000000 + " GWh/year";
+			}
+		});
 	</script>
 </body>
 
